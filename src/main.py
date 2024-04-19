@@ -35,8 +35,8 @@ def main():
 
     states = {
             CHOOSING_ROLE: [
-                CallbackQueryHandler(admin_main, pattern="^admin*"),
-                CallbackQueryHandler(user_main, pattern="^user*"),
+                CallbackQueryHandler(admin_main, pattern="^admin_start"),
+                CallbackQueryHandler(user_main, pattern="^user_start"),
             ],
         }
     states |= admin_states | user_states
