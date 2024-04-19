@@ -19,7 +19,7 @@ def calculate_exam_stats(exam_id, exam_marks_csv, stats_global_csv_db):
     examinee_users = relevant_exam_df.answering_student_id.unique().values
     exam_user_marks_groups = relevant_exam_df.groupby(by='answering_student_id')
     for user_id in examinee_users:
-        user_per_question_exam_stats = usercalculate_individual_stats(exam_user_marks_groups.get_group(user_id))
+        user_per_question_exam_stats = calculate_individual_stats(exam_user_marks_groups.get_group(user_id))
         user_per_question_exam_stats['exam_id'] = exam_id
         user_per_question_exam_stats['user_id'] = user_id
         user_per_question_exam_stats.to_csv(stats_global_csv_db, mode='a', header=False)
