@@ -2,28 +2,10 @@ import os
 import sys
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, CallbackQueryHandler, ConversationHandler
+
+from start import start, CHOOSING_ROLE
 from admin import admin_main, admin_states
 from user import user_main, user_states
-
-
-# First state after start
-CHOOSING_ROLE = 0
-
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """
-    Output the start menu with role choice - admin or user.
-    """
-    keyboard = [
-        [
-            InlineKeyboardButton("Create exam", callback_data="admin_start"),
-            InlineKeyboardButton("Join exam", callback_data="user_start"),
-        ],
-    ]
-
-    reply_markup = InlineKeyboardMarkup(keyboard)
-
-    await update.message.reply_text("Please choose the scenario:", reply_markup=reply_markup)
-    return CHOOSING_ROLE
 
 
 def main():

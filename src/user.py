@@ -6,7 +6,7 @@ from telegram.ext import (
     MessageHandler,
 )
 from exam import Exam
-
+from start import start
 
 USER_STATES_BASE = 100
 
@@ -24,8 +24,7 @@ USER_STATES_BASE = 100
     USER_RATE_EYE_CONTACT_QUESTIONS_STORE,
     USER_RATE_ANSWERS_SKILL_STORE,
     USER_RATE_NOTES_STORE,
-    USER_FINISH_EXAM,
-) = range(USER_STATES_BASE, USER_STATES_BASE + 14)
+) = range(USER_STATES_BASE, USER_STATES_BASE + 13)
 
 
 async def user_main(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -33,17 +32,18 @@ async def user_main(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if query.data == "user_start":
         await query.answer()
+        #### TODO: убрать
+        context.bot_data["exams"] = {}
+        context.bot_data["exams"][42] = Exam(42)
+        context.bot_data["exams"][42].add_speaker("Max Doledenok")
+        context.bot_data["exams"][42].add_speaker("Kirill Nikorov")
+        #################
         await context.bot.send_message(update.effective_chat.id, "Please enter exam id. Creator of exam should tell it to you:")
         return USER_INPUT_ID
     await query.answer("How have you done it? Bot is inconsistent.")
 
 
 async def user_input_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    #### TODO: убрать
-    context.user_data["exam"] = Exam(42)
-    context.user_data["exam"].add_speaker("Max Doledenok")
-    context.user_data["exam"].add_speaker("Kirill Nikorov")
-    #################
     exam_id = update.message.text
     if not exam_id.isdigit():
         await update.message.reply_text("Please enter the number - exam id:")
@@ -72,7 +72,7 @@ async def user_show_list_of_speakers(update: Update, context: ContextTypes.DEFAU
     #### TODO: убрать
     #speakers = ["Max", "Anton", "Gleb", "Ann", "Sergei", "Max", "Anton", "Gleb", "Ann", "Sergei"]
     #################
-    speakers = context.user_data["exam"].get_speakers(context.user_data["name"])
+    speakers = context.user_data["exam"].get_speaker_names(context.user_data["name"])
     keyboard = [[InlineKeyboardButton(f"{speakers[j]}", callback_data=f"user_speaker{j}") for j in range(i, min(len(speakers), i + 3))] for i in range(0, len(speakers), 3)]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await context.bot.send_message(update.effective_chat.id, "Here is the list of speakers. Choose who you want to rate:", reply_markup=reply_markup)
@@ -81,6 +81,7 @@ async def user_show_list_of_speakers(update: Update, context: ContextTypes.DEFAU
 
 async def user_store_speaker_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
+    await query.answer()
     # TODO: Сохранить в context.user_data id спикера, которого сейчас оцениваем
     await context.bot.send_message(update.effective_chat.id, f"You chose {query.data}")
     return await user_show_criteria(update, context)
@@ -95,7 +96,7 @@ async def user_show_criteria(update: Update, context: ContextTypes.DEFAULT_TYPE)
         [InlineKeyboardButton("The skill to answer questions", callback_data=f"user_rate_answers_skill")],
         [InlineKeyboardButton("Notes about performance", callback_data=f"user_rate_notes")],
         [InlineKeyboardButton("Choose another speaker", callback_data=f"user_speakers")],
-        [InlineKeyboardButton("Finish rating", callback_data=f"user_finish")],
+        [InlineKeyboardButton("Finish rating", callback_data=f"user_finish_exam")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await context.bot.send_message(update.effective_chat.id, "Choose what do you want to rate:", reply_markup=reply_markup)
@@ -170,7 +171,7 @@ async def user_rate_notes_store(update: Update, context: ContextTypes.DEFAULT_TY
 
 async def user_finish_exam(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(update.effective_chat.id, "Thank you for participating in the exam! Good luck!")
-    # TODO: Подумать, как нормально завершать
+    return await start(update, context)
 
 
 user_states = {
@@ -188,6 +189,7 @@ user_states = {
         CallbackQueryHandler(user_rate_answers_skill, pattern="^user_rate_answers_skill$"),
         CallbackQueryHandler(user_rate_notes, pattern="^user_rate_notes$"),
         CallbackQueryHandler(user_show_list_of_speakers, pattern="^user_speakers$"),
+        CallbackQueryHandler(user_finish_exam, pattern="^user_finish_exam$"),
     ],
     USER_RATE_CALMNESS_STORY_STORE: [MessageHandler(filters.ALL, user_rate_calmness_story_store)],
     USER_RATE_CALMNESS_QUESTIONS_STORE: [MessageHandler(filters.ALL, user_rate_calmness_questions_store)],
@@ -195,5 +197,4 @@ user_states = {
     USER_RATE_EYE_CONTACT_QUESTIONS_STORE: [MessageHandler(filters.ALL, user_rate_eye_contact_questions_store)],
     USER_RATE_ANSWERS_SKILL_STORE: [MessageHandler(filters.ALL, user_rate_answers_skill_store)],
     USER_RATE_NOTES_STORE: [MessageHandler(filters.ALL, user_rate_notes_store)],
-    USER_FINISH_EXAM: [MessageHandler(filters.ALL, user_finish_exam)],
 }
