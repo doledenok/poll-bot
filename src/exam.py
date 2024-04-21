@@ -1,10 +1,29 @@
+import os
+import enum
+import csv
 from typing import List, Dict
+
+
+class ExamStatus(enum.Enum):
+    Created = 0
+    RegistrationFinished = 1
+    PresentationsFinished = 2
+    ResultsReviewFinished = 3
+
+class ExaminatedSkills(enum.Enum):
+    CalmnessStory = 0
+    CalmnessQuestions = 1
+    EyeContactStory = 2
+    EyeContactQuesitons = 3
+    AnswerSkill = 4
+    Notes = 5
 
 class Exam:
     def __init__(self, id: int):
         self.exam_id = id
         self.speaker_names: List[str] = []
         self.speaker_answers: List[Dict[int, dict]] = []
+        self.exam_status: ExamStatus = ExamStatus.Created
 
     def add_speaker(self, name: str) -> int | None:
         """
@@ -45,3 +64,24 @@ class Exam:
         if speaker_id not in self.speaker_answers[listener_id]:
             self.speaker_answers[listener_id][speaker_id] = {}
         self.speaker_answers[listener_id][speaker_id][field] = value
+
+    def save_results(self, exams_csv_db: str) -> None:
+        saved_rows = 0
+        with open(exams_csv_db, 'a+', newline='') as csvfile:
+            fieldnames = ['exam_id', 'answering_student_id', 'listening_student_id', 'question_id', 'student_mark']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+            if os.path.getsize(exams_csv_db) == 0:
+                writer.writeheader()
+            for listener_id in range(len(self.speaker_answers)):
+                for speaker_id in self.speaker_answers[listener_id]:
+                    for field in self.speaker_answers[listener_id][speaker_id]:
+                        writer.writerow({
+                            'exam_id': self.exam_id,
+                            'answering_student_id': speaker_id,
+                            'listening_student_id': listener_id,
+                            'question_id': field,
+                            'student_mark': self.speaker_answers[listener_id][speaker_id][field]
+                        })
+                        saved_rows += 1
+        return saved_rows
