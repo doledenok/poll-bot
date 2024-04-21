@@ -5,8 +5,9 @@ from telegram.ext import (
     filters,
     MessageHandler,
 )
-from exam import Exam
+from exam import Exam, ExamStatus
 from start import start
+import time
 
 
 """
@@ -45,7 +46,8 @@ async def user_main(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data == "user_start":
         await query.answer()
         #### TODO: убрать
-        context.bot_data["exams"] = {}
+        if "exams" not in context.bot_data:
+            context.bot_data["exams"] = {}
         context.bot_data["exams"][42] = Exam(42)
         context.bot_data["exams"][42].add_speaker("Max Doledenok")
         context.bot_data["exams"][42].add_speaker("Kirill Nikorov")
@@ -63,7 +65,11 @@ async def user_input_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     exam_id = int(exam_id)
     if "exams" not in context.bot_data or exam_id not in context.bot_data["exams"]:
-        await update.message.reply_text("Please enter the exsisted exam id:")
+        if "exams" not in context.bot_data:
+            await update.message.reply_text("The is no registrated exams. Wait for exam creation")
+            return USER_INPUT_ID
+        elif exam_id not in context.bot_data["exams"]:
+            await update.message.reply_text(f"Exam {exam_id} is not registered. Please enter the existed exam id:")
         return USER_INPUT_ID
     context.user_data["exam_id"] = exam_id
     context.user_data["exam"] = context.bot_data["exams"][exam_id]
@@ -80,11 +86,25 @@ async def user_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.bot.send_message(update.effective_chat.id, "This name already exists! Enter another please")
         return USER_NAME
     context.user_data["user_id"] = user_id
-    await update.message.reply_text(f"Hello {name}!")
-    return await user_show_list_of_speakers(update, context)
+    keyboard = [[InlineKeyboardButton("Start listening", callback_data="user_start_listening")]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_text(f"Hello {name}!\nLet's wait till exam creator finishes the registration and start our speakers listening.",
+                                    reply_markup=reply_markup)
+    return USER_SHOW_LIST_OF_SPEAKERS
 
 
 async def user_show_list_of_speakers(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    while context.user_data["exam"].exam_status != ExamStatus.RegistrationFinished:
+        keyboard = [[InlineKeyboardButton("Start listening", callback_data="user_start_listening")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await context.bot.send_message(update.effective_chat.id,
+                                       text=f"Sorry, exam creator has not finished exam registration yet. Check it again a bit later.",
+                                       reply_markup=reply_markup)
+        return USER_SHOW_LIST_OF_SPEAKERS
+
     speakers = context.user_data["exam"].get_speaker_names(context.user_data["user_id"])
     keyboard = [[InlineKeyboardButton(f"{speakers[j]}", callback_data=f"user_speaker{j}") for j in range(i, min(len(speakers), i + 3))] for i in range(0, len(speakers), 3)]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -109,9 +129,9 @@ async def user_store_speaker_id(update: Update, context: ContextTypes.DEFAULT_TY
 async def user_show_criteria(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("Calmness while telling a story", callback_data=f"user_rate_calmness_story")],
-        [InlineKeyboardButton("Calmness while answering questions", callback_data=f"user_rate_calmness_answers")],
+        [InlineKeyboardButton("Calmness while answering questions", callback_data=f"user_rate_calmness_questions")],
         [InlineKeyboardButton("Eye contact while telling a story", callback_data=f"user_rate_eye_contact_story")],
-        [InlineKeyboardButton("Eye contact while answering questions", callback_data=f"user_rate_eye_contact_answers")],
+        [InlineKeyboardButton("Eye contact while answering questions", callback_data=f"user_rate_eye_contact_questions")],
         [InlineKeyboardButton("The skill to answer questions", callback_data=f"user_rate_answers_skill")],
         [InlineKeyboardButton("Notes about performance", callback_data=f"user_rate_notes")],
         [InlineKeyboardButton("Choose another speaker", callback_data=f"user_speakers")],
@@ -243,7 +263,7 @@ async def user_rate_notes_store(update: Update, context: ContextTypes.DEFAULT_TY
 
 
 async def user_finish_exam(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(update.effective_chat.id, "Thank you for participating in the exam! Good luck!")
+    await context.bot.send_message(update.effective_chat.id, "Thank you for participating in the exam!\nNow you can wait for exam finish to see the global and individual results.\nGood luck!")
     return await start(update, context)
 
 
@@ -251,7 +271,7 @@ user_states = {
     USER_MAIN: [MessageHandler(filters.ALL, user_main)],
     USER_INPUT_ID: [MessageHandler(filters.ALL, user_input_id)],
     USER_NAME: [MessageHandler(filters.ALL, user_name)],
-    USER_SHOW_LIST_OF_SPEAKERS: [MessageHandler(filters.ALL, user_show_list_of_speakers)],
+    USER_SHOW_LIST_OF_SPEAKERS: [CallbackQueryHandler(user_show_list_of_speakers, pattern="^user_start_listening$")],
     USER_STORE_SPEAKER_ID: [CallbackQueryHandler(user_store_speaker_id, pattern="^user_speaker*")],
     USER_SHOW_CRITERIA: [MessageHandler(filters.ALL, user_show_criteria)],
     USER_CHOOSE_RATE: [
