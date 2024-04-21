@@ -133,7 +133,7 @@ async def admin_choosing_student_for_exam_results_button(update: Update, context
     exam_id = context.user_data["exam_id"]
     students_names = context.user_data["exam"].get_speaker_names()
     if query.data == 'admin_all_students_results':
-        exam_results = statistics.get_exam_results(exam_id, STATISTICS_DATABASE_PATH)
+        exam_results = statistics.get_exam_results(exam_id, students_names, STATISTICS_DATABASE_PATH)
         for student_id, student_result in exam_results.items():
             student_name = students_names[student_id]
             await context.bot.send_message(chat_id=update.effective_chat.id, text=f"*{student_name}* results are\n```{student_result}```\n\n",
@@ -144,7 +144,7 @@ async def admin_choosing_student_for_exam_results_button(update: Update, context
     elif query.data.startswith("admin_student_"):
         student_id = int(query.data.split('_')[2])
         student_name = students_names[student_id]
-        student_result = statistics.get_student_results(exam_id, student_id, STATISTICS_DATABASE_PATH)
+        student_result = statistics.get_student_results(exam_id, student_id, students_names, STATISTICS_DATABASE_PATH)
         # results = ["perfect", "good", "bad"]
         # student_result = random.choice(results)
         await context.bot.send_message(chat_id=update.effective_chat.id, text=f"*{student_name}* results are\n```{student_result}```",

@@ -52,7 +52,7 @@ def calculate_exam_stats(exam_id: int, exam_marks_csv: str, stats_global_csv_db:
         user_per_question_exam_stats['user_id'] = user_id
         user_per_question_exam_stats.to_csv(stats_global_csv_db, mode='a+', header=not os.path.exists(stats_global_csv_db))
 
-def get_exam_results(exam_id: int, stats_global_csv_db: str) -> Dict[int, str]:
+def get_exam_results(exam_id: int, students_names: List[str], stats_global_csv_db: str) -> Dict[int, str]:
     exam_stats_df = pd.read_csv(stats_global_csv_db)
     relevant_resutls = exam_stats_df[exam_stats_df['exam_id'] == exam_id]
     per_user_relevant_resutls = relevant_resutls.groupby(by='user_id')
@@ -60,7 +60,7 @@ def get_exam_results(exam_id: int, stats_global_csv_db: str) -> Dict[int, str]:
     per_user_markdown_results = dict()
     for user_id in user_ids:
         user_relevant_results = per_user_relevant_resutls.get_group(user_id)
-        user_plot_results_figure = plot_student_results(user_id, 
+        user_plot_results_figure = plot_student_results(students_names[user_id],
                              list(user_relevant_results.question_id.values.flatten()), 
                              list(user_relevant_results.mean_student_mark.values.flatten()))
         user_plot_results_figure.savefig(f'{stats_global_csv_db}_{exam_id}_{user_id}_results.png')
@@ -68,11 +68,11 @@ def get_exam_results(exam_id: int, stats_global_csv_db: str) -> Dict[int, str]:
 
     return per_user_markdown_results
 
-def get_student_results(exam_id: int, student_id: int, stats_global_csv_db: str) -> str:
+def get_student_results(exam_id: int, student_id: int, students_names: List[str], stats_global_csv_db: str) -> str:
     exam_stats_df = pd.read_csv(stats_global_csv_db)
     student_all_results = exam_stats_df[exam_stats_df['user_id'] == student_id]
     relevant_resutls = student_all_results[student_all_results['exam_id'] == exam_id]
-    user_plot_results_figure = plot_student_results(student_id, 
+    user_plot_results_figure = plot_student_results(students_names[student_id],
                                                     list(relevant_resutls.question_id.values.flatten()), 
                                                     list(relevant_resutls.mean_student_mark.values.flatten()))
     user_plot_results_figure.savefig(f'{stats_global_csv_db}_{exam_id}_{user_id}_results.png')
