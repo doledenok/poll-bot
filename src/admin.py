@@ -3,10 +3,12 @@ import sys
 import random
 import datetime
 import csv
+import telegram
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, CallbackQueryHandler, ConversationHandler
 from exam import Exam, ExamStatus
 from user import user_main, user_states
+import statistics
 
 
 """
@@ -15,6 +17,8 @@ from user import user_main, user_states
  - exam_id - id экзамена для текущего админа
 """
 
+EXAMS_DATABASE_PATH = '/home/knikorov/Studing/PythonDevelopment2024/poll-bot/data/exams_db.csv'
+STATISTICS_DATABASE_PATH = '/home/knikorov/Studing/PythonDevelopment2024/poll-bot/data/exams_stats_db.csv'
 
 ADMIN_STATES_BASE = 10
 AWAITING_FOR_EXAM_REGISTRATION_FINISH = ADMIN_STATES_BASE + 0
@@ -87,11 +91,13 @@ async def admin_finish_exam_command(update: Update, context: ContextTypes.DEFAUL
     context.user_data["exam"].exam_status = ExamStatus.PresentationsFinished
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Your exam is finished. Now we start to aggregate all results")
 
-    saved_rows = context.user_data["exam"].save_results('/home/knikorov/Studing/PythonDevelopment2024/poll-bot/data/exams_db.csv')
+    saved_rows = context.user_data["exam"].save_results(EXAMS_DATABASE_PATH)
     print(f'Processed and saved {saved_rows} rows for exam {context.user_data["exam_id"]}')
 
+    statistics.calculate_exam_stats(context.user_data["exam_id"], EXAMS_DATABASE_PATH, STATISTICS_DATABASE_PATH)
+
     # Видимо, это лучше сделать через KeyboardMarkup, чтобы не спамить каждый раз таблицей-сообщением
-    student_list_for_exam = context.bot_data["exams"][context.user_data["exam_id"]].get_speaker_names()
+    student_list_for_exam = context.user_data["exam"].get_speaker_names()
     number_of_students_on_exam = len(student_list_for_exam)
     N_COLS = 3
     N_ROWS = number_of_students_on_exam // N_COLS + int(number_of_students_on_exam % N_COLS != 0)
@@ -104,6 +110,7 @@ async def admin_finish_exam_command(update: Update, context: ContextTypes.DEFAUL
         for j in range(N_COLS):
             current_row.append(InlineKeyboardButton(students_results[i][j], callback_data=f"admin_student_{i*N_COLS + j}_results"))
         keyboard.append(current_row)
+    keyboard.append([InlineKeyboardButton("Get results for all students", callback_data=f"admin_all_students_results")])
     keyboard.append([InlineKeyboardButton("Finish results review", callback_data=f"admin_finish_review_results")])
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -123,10 +130,30 @@ async def admin_choosing_student_for_exam_results_button(update: Update, context
         await context.bot.send_message(chat_id=update.effective_chat.id, text="You've clicked finish-button.\nCongratulations! A lot of your students are doing better!")
         return ADMIN_FINISH_EXAM_RESULTS_REVIEW
 
-    results = ["perfect", "good", "bad"]
-    student_name = ' '.join(query.data.split('_')[1: -1]).capitalize()
-    student_result = random.choice(results)
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{student_name} results are {student_result}")
+    exam_id = context.user_data["exam_id"]
+    students_names = context.user_data["exam"].get_speaker_names()
+    if query.data == 'admin_all_students_results':
+        exam_results = statistics.get_exam_results(exam_id, STATISTICS_DATABASE_PATH)
+        for student_id, student_result in exam_results.items():
+            student_name = students_names[student_id]
+            await context.bot.send_message(chat_id=update.effective_chat.id, text=f"*{student_name}* results are\n```{student_result}```\n\n",
+                                           parse_mode=telegram.constants.ParseMode.MARKDOWN_V2)
+            await context.bot.send_photo(chat_id=update.effective_chat.id, photo=f'{STATISTICS_DATABASE_PATH}_{exam_id}_{student_id}_results.png',
+                                        caption=f"*{student_name}* results",
+                                        parse_mode=telegram.constants.ParseMode.MARKDOWN_V2)
+    elif query.data.startswith("admin_student_"):
+        student_id = int(query.data.split('_')[2])
+        student_name = students_names[student_id]
+        student_result = statistics.get_student_results(exam_id, student_id, STATISTICS_DATABASE_PATH)
+        # results = ["perfect", "good", "bad"]
+        # student_result = random.choice(results)
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"*{student_name}* results are\n```{student_result}```",
+                                       parse_mode=telegram.constants.ParseMode.MARKDOWN_V2)
+        await context.bot.send_photo(chat_id=update.effective_chat.id, photo=f'{STATISTICS_DATABASE_PATH}_{exam_id}_{student_id}_results.png',
+                                       caption=f"*{student_name}* results",
+                                       parse_mode=telegram.constants.ParseMode.MARKDOWN_V2)
+    else:
+        print(f'Strange query data {query.data} in admin_exam_registration_finish', file=sys.stderr)
 
     # Видимо, это лучше сделать через KeyboardMarkup, чтобы не спамить каждый раз таблицей-сообщением
     student_list_for_exam = context.bot_data["exams"][context.user_data["exam_id"]].get_speaker_names()
