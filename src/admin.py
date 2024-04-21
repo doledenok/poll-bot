@@ -6,18 +6,19 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, Callb
 from exam import Exam
 from user import user_main, user_states
 
+
+"""
+В context.bot_data["exams"] находятся объекты класса exam.Exam, где хранится вся информация об экзаменах
+В context.user_data есть ключи:
+ - exam_id - id экзамена для текущего админа
+"""
+
+
 ADMIN_STATES_BASE = 10
 AWAITING_FOR_EXAM_REGISTRATION_FINISH = ADMIN_STATES_BASE + 0
 ADMIN_FINISH_EXAM_COMMAND = ADMIN_STATES_BASE + 1
 ADMIN_CHOOSING_STUDENT_FOR_EXAM_RESULTS_REVIEW = ADMIN_STATES_BASE + 2
 ADMIN_FINISH_EXAM_RESULTS_REVIEW = ADMIN_STATES_BASE + 3
-
-
-"""
-В context.bot_data["exams"] находятся объекты класса exam.Exam, где хранится вся информация об экзаменах
-В context.user_data есть ключи:
- - exam_id - id экзамена для текущего пользователя
-"""
 
 
 async def admin_main(update: Update, context: ContextTypes.DEFAULT_TYPE):

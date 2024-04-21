@@ -8,6 +8,18 @@ from telegram.ext import (
 from exam import Exam
 from start import start
 
+
+"""
+В context.bot_data["exams"] находятся объекты класса exam.Exam, где хранится вся информация об экзаменах
+В context.user_data есть ключи:
+ - exam_id - id экзамена для текущего пользователя
+ - exam - объект класса exam.Exam
+ - name - имя пользователя
+ - user_id - id пользователя
+ - speaker_id - id выступающего, которого сейчас оценивает пользователь
+"""
+
+
 USER_STATES_BASE = 100
 
 (
@@ -63,16 +75,17 @@ async def user_input_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def user_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name = update.message.text
     context.user_data["name"] = name
-    context.user_data["exam"].add_speaker(name)
+    user_id = context.user_data["exam"].add_speaker(name)
+    if user_id is None:
+        context.bot.send_message(update.effective_chat.id, "This name already exists! Enter another please")
+        return USER_NAME
+    context.user_data["user_id"] = user_id
     await update.message.reply_text(f"Hello {name}!")
     return await user_show_list_of_speakers(update, context)
 
 
 async def user_show_list_of_speakers(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    #### TODO: убрать
-    #speakers = ["Max", "Anton", "Gleb", "Ann", "Sergei", "Max", "Anton", "Gleb", "Ann", "Sergei"]
-    #################
-    speakers = context.user_data["exam"].get_speaker_names(context.user_data["name"])
+    speakers = context.user_data["exam"].get_speaker_names(context.user_data["user_id"])
     keyboard = [[InlineKeyboardButton(f"{speakers[j]}", callback_data=f"user_speaker{j}") for j in range(i, min(len(speakers), i + 3))] for i in range(0, len(speakers), 3)]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await context.bot.send_message(update.effective_chat.id, "Here is the list of speakers. Choose who you want to rate:", reply_markup=reply_markup)
@@ -82,8 +95,14 @@ async def user_show_list_of_speakers(update: Update, context: ContextTypes.DEFAU
 async def user_store_speaker_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    # TODO: Сохранить в context.user_data id спикера, которого сейчас оцениваем
-    await context.bot.send_message(update.effective_chat.id, f"You chose {query.data}")
+    if query.data.startswith("user_speaker"):
+        speaker_id = int(query.data[len("user_speaker"):])
+        context.user_data["speaker_id"] = speaker_id
+    else:
+        await query.answer("How have you done it? Bot is inconsistent.")
+        return
+
+    await context.bot.send_message(update.effective_chat.id, f"You chose {context.user_data['exam'].get_name_by_id(speaker_id)}")
     return await user_show_criteria(update, context)
 
 
@@ -103,13 +122,35 @@ async def user_show_criteria(update: Update, context: ContextTypes.DEFAULT_TYPE)
     return USER_CHOOSE_RATE
 
 
+async def user_get_one_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Support function for getting number between 0 and 10.
+    """
+    answer = update.message.text
+    if not answer.isdigit():
+        await context.bot.send_message(update.effective_chat.id, "Please enter the number!")
+        return None
+    score = int(answer)
+    if not 0 <= score <= 10:
+        await context.bot.send_message(update.effective_chat.id, "Please enter the number between 0 and 10!")
+        return None
+    return score
+
+
 async def user_rate_calmness_story(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(update.effective_chat.id, "Input number from 0 to 10 where 10 is excellent")
     return USER_RATE_CALMNESS_STORY_STORE
 
 
 async def user_rate_calmness_story_store(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Сохранить оценку
+    score = await user_get_one_number(update, context)
+    if score == None:
+        return await user_show_criteria(update, context)
+    context.user_data["exam"].add_answer(
+        context.user_data["user_id"],
+        context.user_data["speaker_id"],
+        "calmness_story",
+        score)
     await context.bot.send_message(update.effective_chat.id, "Thanks! Stored.")
     return await user_show_criteria(update, context)
 
@@ -120,7 +161,14 @@ async def user_rate_calmness_questions(update: Update, context: ContextTypes.DEF
 
 
 async def user_rate_calmness_questions_store(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Сохранить оценку
+    score = await user_get_one_number(update, context)
+    if score == None:
+        return await user_show_criteria(update, context)
+    context.user_data["exam"].add_answer(
+        context.user_data["user_id"],
+        context.user_data["speaker_id"],
+        "calmness_questions",
+        score)
     await context.bot.send_message(update.effective_chat.id, "Thanks! Stored.")
     return await user_show_criteria(update, context)
 
@@ -131,7 +179,14 @@ async def user_rate_eye_contact_story(update: Update, context: ContextTypes.DEFA
 
 
 async def user_rate_eye_contact_story_store(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Сохранить оценку
+    score = await user_get_one_number(update, context)
+    if score == None:
+        return await user_show_criteria(update, context)
+    context.user_data["exam"].add_answer(
+        context.user_data["user_id"],
+        context.user_data["speaker_id"],
+        "eye_contact_story",
+        score)
     await context.bot.send_message(update.effective_chat.id, "Thanks! Stored.")
     return await user_show_criteria(update, context)
 
@@ -142,7 +197,14 @@ async def user_rate_eye_contact_questions(update: Update, context: ContextTypes.
 
 
 async def user_rate_eye_contact_questions_store(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Сохранить оценку
+    score = await user_get_one_number(update, context)
+    if score == None:
+        return await user_show_criteria(update, context)
+    context.user_data["exam"].add_answer(
+        context.user_data["user_id"],
+        context.user_data["speaker_id"],
+        "eye_contact_quesitons",
+        score)
     await context.bot.send_message(update.effective_chat.id, "Thanks! Stored.")
     return await user_show_criteria(update, context)
 
@@ -153,18 +215,29 @@ async def user_rate_answers_skill(update: Update, context: ContextTypes.DEFAULT_
 
 
 async def user_rate_answers_skill_store(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Сохранить оценку
+    score = await user_get_one_number(update, context)
+    if score == None:
+        return await user_show_criteria(update, context)
+    context.user_data["exam"].add_answer(
+        context.user_data["user_id"],
+        context.user_data["speaker_id"],
+        "answer_skill",
+        score)
     await context.bot.send_message(update.effective_chat.id, "Thanks! Stored.")
     return await user_show_criteria(update, context)
 
 
 async def user_rate_notes(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(update.effective_chat.id, "Input number from 0 to 10 where 10 is excellent")
+    await context.bot.send_message(update.effective_chat.id, "Enter notes you want to save:")
     return USER_RATE_NOTES_STORE
 
 
 async def user_rate_notes_store(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Сохранить оценку
+    context.user_data["exam"].add_answer(
+        context.user_data["user_id"],
+        context.user_data["speaker_id"],
+        "notes",
+        update.message.text)
     await context.bot.send_message(update.effective_chat.id, "Thanks! Stored.")
     return await user_show_criteria(update, context)
 
