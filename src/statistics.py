@@ -75,7 +75,7 @@ def get_student_results(exam_id: int, student_id: int, students_names: List[str]
     user_plot_results_figure = plot_student_results(students_names[student_id],
                                                     list(relevant_resutls.question_id.values.flatten()), 
                                                     list(relevant_resutls.mean_student_mark.values.flatten()))
-    user_plot_results_figure.savefig(f'{stats_global_csv_db}_{exam_id}_{user_id}_results.png')
+    user_plot_results_figure.savefig(f'{stats_global_csv_db}_{exam_id}_{student_id}_results.png')
 
     #### TODO: реализовать графики с прогрессом, когда накопится история сдач
     # per_question_student_results = student_all_results.groupby(by='question_id')
