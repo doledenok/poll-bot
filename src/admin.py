@@ -169,6 +169,7 @@ async def admin_choosing_student_for_exam_results_button(update: Update, context
         for j in range(N_COLS):
             current_row.append(InlineKeyboardButton(students_results[i][j], callback_data=f"admin_student_{i*N_COLS + j}_results"))
         keyboard.append(current_row)
+    keyboard.append([InlineKeyboardButton("Get results for all students", callback_data=f"admin_all_students_results")])
     keyboard.append([InlineKeyboardButton("Finish results review", callback_data=f"admin_finish_review_results")])
     reply_markup = InlineKeyboardMarkup(keyboard)
 
