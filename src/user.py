@@ -109,9 +109,9 @@ async def user_store_speaker_id(update: Update, context: ContextTypes.DEFAULT_TY
 async def user_show_criteria(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("Calmness while telling a story", callback_data=f"user_rate_calmness_story")],
-        [InlineKeyboardButton("Calmness while answering questions", callback_data=f"user_rate_calmness_answers")],
+        [InlineKeyboardButton("Calmness while answering questions", callback_data=f"user_rate_calmness_questions")],
         [InlineKeyboardButton("Eye contact while telling a story", callback_data=f"user_rate_eye_contact_story")],
-        [InlineKeyboardButton("Eye contact while answering questions", callback_data=f"user_rate_eye_contact_answers")],
+        [InlineKeyboardButton("Eye contact while answering questions", callback_data=f"user_rate_eye_contact_questions")],
         [InlineKeyboardButton("The skill to answer questions", callback_data=f"user_rate_answers_skill")],
         [InlineKeyboardButton("Notes about performance", callback_data=f"user_rate_notes")],
         [InlineKeyboardButton("Choose another speaker", callback_data=f"user_speakers")],

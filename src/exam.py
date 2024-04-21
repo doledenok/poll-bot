@@ -41,7 +41,6 @@ class Exam:
         - answer_skill
         - notes
         """
-        print(listener_id, speaker_id, field, value)
         if speaker_id not in self.speaker_answers[listener_id]:
             self.speaker_answers[listener_id][speaker_id] = {}
         self.speaker_answers[listener_id][speaker_id][field] = value
