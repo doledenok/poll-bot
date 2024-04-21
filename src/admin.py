@@ -1,9 +1,11 @@
 import os
 import sys
 import random
+import datetime
+import csv
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, CallbackQueryHandler, ConversationHandler
-from exam import Exam
+from exam import Exam, ExamStatus
 from user import user_main, user_states
 
 
@@ -33,11 +35,19 @@ async def admin_main(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print(f'Strange query data {query.data} in admin_main', file=sys.stderr)
         return
 
-    generated_exam_id = 42 # TODO: идеально случайно сгенерированный id
+    #### TODO: раскомментить
+    generated_exam_id = int(1)  # int(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))  # TODO: идеально случайно сгенерированный id
+    #################
     if "exams" not in context.bot_data:
         context.bot_data["exams"] = {}
     context.bot_data["exams"][generated_exam_id] = Exam(generated_exam_id)
     context.user_data["exam_id"] = generated_exam_id
+    context.user_data["exam"] = context.bot_data["exams"][generated_exam_id]
+    #### TODO: убрать
+    context.bot_data["exams"][generated_exam_id].add_speaker("Max Doledenok")
+    context.bot_data["exams"][generated_exam_id].add_speaker("Kirill Nikorov")
+    #################
+
     await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Your exam id is {generated_exam_id}")
 
     return await admin_print_exam_registration_finish(update, context)
@@ -55,14 +65,12 @@ async def admin_print_exam_registration_finish(update: Update, context: ContextT
 
 async def admin_exam_registration_finish(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-
-    # CallbackQueries need to be answered, even if no notification to the user is needed
-    # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
     await query.answer()
 
     if query.data != "admin_student_list":
         print(f'Strange query data {query.data} in admin_student_list', file=sys.stderr)
         return
+    context.user_data["exam"].exam_status = ExamStatus.RegistrationFinished
     student_list_for_exam = context.bot_data["exams"][context.user_data["exam_id"]].get_speaker_names()
     if not student_list_for_exam:
         await context.bot.send_message(chat_id=update.effective_chat.id, text="No registered student! Please try later.")
@@ -76,18 +84,25 @@ async def admin_finish_exam_command(update: Update, context: ContextTypes.DEFAUL
     """
     Output the start menu with role choice - admin or user.
     """
-
+    context.user_data["exam"].exam_status = ExamStatus.PresentationsFinished
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Your exam is finished. Now we start to aggregate all results")
 
+    saved_rows = context.user_data["exam"].save_results('/home/knikorov/Studing/PythonDevelopment2024/poll-bot/data/exams_db.csv')
+    print(f'Processed and saved {saved_rows} rows for exam {context.user_data["exam_id"]}')
+
     # Видимо, это лучше сделать через KeyboardMarkup, чтобы не спамить каждый раз таблицей-сообщением
-    N_ROWS = 5
-    N_COLS = 5
-    students_results = [[f'Student_{i*N_COLS + j}' for j in range(N_COLS)] for i in range(N_ROWS)]
+    student_list_for_exam = context.bot_data["exams"][context.user_data["exam_id"]].get_speaker_names()
+    number_of_students_on_exam = len(student_list_for_exam)
+    N_COLS = 3
+    N_ROWS = number_of_students_on_exam // N_COLS + int(number_of_students_on_exam % N_COLS != 0)
+    students_results = [[f'{student_list_for_exam[i*N_COLS + j]}' if (i*N_COLS + j < number_of_students_on_exam)
+                                                                  else '' for j in range(N_COLS)] for i in range(N_ROWS)]
+
     keyboard = []
     for i in range(N_ROWS):
         current_row = []
         for j in range(N_COLS):
-            current_row.append(InlineKeyboardButton(students_results[i][j], callback_data=f"admin_{students_results[i][j].replace(' ', '_').lower()}_results"))
+            current_row.append(InlineKeyboardButton(students_results[i][j], callback_data=f"admin_student_{i*N_COLS + j}_results"))
         keyboard.append(current_row)
     keyboard.append([InlineKeyboardButton("Finish results review", callback_data=f"admin_finish_review_results")])
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -114,14 +129,18 @@ async def admin_choosing_student_for_exam_results_button(update: Update, context
     await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{student_name} results are {student_result}")
 
     # Видимо, это лучше сделать через KeyboardMarkup, чтобы не спамить каждый раз таблицей-сообщением
-    N_ROWS = 5
-    N_COLS = 5
-    students_results = [[f'Student_{i*N_COLS + j}' for j in range(N_COLS)] for i in range(N_ROWS)]
+    student_list_for_exam = context.bot_data["exams"][context.user_data["exam_id"]].get_speaker_names()
+    number_of_students_on_exam = len(student_list_for_exam)
+    N_COLS = 3
+    N_ROWS = number_of_students_on_exam // N_COLS + int(number_of_students_on_exam % N_COLS != 0)
+    students_results = [[f'{student_list_for_exam[i*N_COLS + j]}' if (i*N_COLS + j < number_of_students_on_exam)
+                                                                  else '' for j in range(N_COLS)] for i in range(N_ROWS)]
+
     keyboard = []
     for i in range(N_ROWS):
         current_row = []
         for j in range(N_COLS):
-            current_row.append(InlineKeyboardButton(students_results[i][j], callback_data=f"admin_{students_results[i][j].replace(' ', '_').lower()}_results"))
+            current_row.append(InlineKeyboardButton(students_results[i][j], callback_data=f"admin_student_{i*N_COLS + j}_results"))
         keyboard.append(current_row)
     keyboard.append([InlineKeyboardButton("Finish results review", callback_data=f"admin_finish_review_results")])
     reply_markup = InlineKeyboardMarkup(keyboard)
