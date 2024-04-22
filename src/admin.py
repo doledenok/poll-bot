@@ -137,7 +137,7 @@ async def admin_choosing_student_for_exam_results_button(update: Update, context
             # await context.bot.send_message(chat_id=update.effective_chat.id, text=f"*{student_name}* results are\n```{student_result}```\n\n",
             #                                parse_mode=telegram.constants.ParseMode.MARKDOWN_V2)
             await context.bot.send_photo(chat_id=update.effective_chat.id, photo=f'{STATISTICS_DATABASE_PATH}_{exam_id}_{student_id}_results.png',
-                                        caption=messages.EXAM_INDIVIDUAL_RESULTS[user_language] % student_name,
+                                        caption=messages.EXAM_INDIVIDUAL_RESULTS[user_language] % (student_name, student_result),
                                         parse_mode=telegram.constants.ParseMode.MARKDOWN_V2)
     elif query.data.startswith("admin_student_"):
         student_id = int(query.data.split('_')[2])
@@ -148,7 +148,7 @@ async def admin_choosing_student_for_exam_results_button(update: Update, context
         # await context.bot.send_message(chat_id=update.effective_chat.id, text=f"*{student_name}* results are\n```{student_result}```",
         #                                parse_mode=telegram.constants.ParseMode.MARKDOWN_V2)
         await context.bot.send_photo(chat_id=update.effective_chat.id, photo=f'{STATISTICS_DATABASE_PATH}_{exam_id}_{student_id}_results.png',
-                                       caption=messages.EXAM_INDIVIDUAL_RESULTS[user_language] % student_name,
+                                       caption=messages.EXAM_INDIVIDUAL_RESULTS[user_language] % (student_name, student_result),
                                        parse_mode=telegram.constants.ParseMode.MARKDOWN_V2)
     else:
         print(f'Strange query data {query.data} in admin_exam_registration_finish', file=sys.stderr)

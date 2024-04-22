@@ -175,6 +175,6 @@ EXAM_FINISH_REVIEW_DESCRIPTION = {
         "ru": "Вы нажали кнопку \"Готово\".\nПоздравляем! Результаты многих ваших студентов стали лучше!"
 }
 EXAM_INDIVIDUAL_RESULTS = {
-        "en": "*%s* results",
-        "ru": "*%s*\. Результаты\."
+        "en": "*%s* results\.\nListeners notes:\n```Notes\n%s\n```",
+        "ru": "*%s*\. Результаты\.\nЗамечания слушателей:\n```Замечания\n%s\n```"
 }

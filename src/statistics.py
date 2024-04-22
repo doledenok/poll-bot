@@ -47,7 +47,23 @@ def calculate_exam_stats(exam_id: int, exam_marks_csv: str, stats_global_csv_db:
     examinee_users = relevant_exam_df.answering_student_id.unique()
     exam_user_marks_groups = relevant_exam_df.groupby(by='answering_student_id')
     for user_id in examinee_users:
-        user_per_question_exam_stats = calculate_individual_stats(exam_user_marks_groups.get_group(user_id))
+        exam_user_marks = exam_user_marks_groups.get_group(user_id)
+        exam_user_numeric_questions = exam_user_marks.loc[exam_user_marks.question_id != 'notes']
+        exam_user_notes_question = exam_user_marks.loc[exam_user_marks.question_id == 'notes']
+        user_per_question_exam_stats = calculate_individual_stats(exam_user_numeric_questions)
+        if len(exam_user_notes_question) > 0:
+            joint_notes = '\n'.join(exam_user_notes_question.student_mark.values)
+            notes_cnt = len(exam_user_notes_question)
+            user_notes_stats_df = pd.DataFrame(
+                {
+                    'question_id': ['notes'],
+                    'mean_student_mark': [joint_notes],
+                    'median_student_mark': [0.0],
+                    'std_student_mark': [0.0],
+                    'cnt_student_mark': [notes_cnt],
+                }
+            ).set_index('question_id')
+            user_per_question_exam_stats = pd.concat((user_per_question_exam_stats, user_notes_stats_df), axis=0)
         user_per_question_exam_stats['exam_id'] = exam_id
         user_per_question_exam_stats['user_id'] = user_id
         user_per_question_exam_stats.to_csv(stats_global_csv_db, mode='a+', header=not os.path.exists(stats_global_csv_db))
@@ -57,25 +73,33 @@ def get_exam_results(exam_id: int, students_names: List[str], stats_global_csv_d
     relevant_resutls = exam_stats_df[exam_stats_df['exam_id'] == exam_id]
     per_user_relevant_resutls = relevant_resutls.groupby(by='user_id')
     user_ids = per_user_relevant_resutls.groups.keys()
-    per_user_markdown_results = dict()
+    per_user_notes_results = dict()
     for user_id in user_ids:
         user_relevant_results = per_user_relevant_resutls.get_group(user_id)
+        user_relevant_numeric_results = user_relevant_results[user_relevant_results.question_id != 'notes']
+        user_relevant_string_results = user_relevant_results[user_relevant_results.question_id == 'notes']
         user_plot_results_figure = plot_student_results(students_names[user_id],
-                             list(user_relevant_results.question_id.values.flatten()), 
-                             list(user_relevant_results.mean_student_mark.values.flatten()))
+                             list(user_relevant_numeric_results.question_id.values.flatten()),
+                             list(map(float, user_relevant_numeric_results.mean_student_mark.values.flatten())))
         user_plot_results_figure.savefig(f'{stats_global_csv_db}_{exam_id}_{user_id}_results.png')
-        per_user_markdown_results[user_id] = user_relevant_results.sort_values(by='question_id', axis=0).to_markdown()
+        per_user_notes_results[user_id] = ''
+        if len(user_relevant_string_results) > 0:
+            per_user_notes_results[user_id] = user_relevant_string_results.mean_student_mark.values.flatten()[0]
 
-    return per_user_markdown_results
+    return per_user_notes_results
 
 def get_student_results(exam_id: int, student_id: int, students_names: List[str], stats_global_csv_db: str) -> str:
     exam_stats_df = pd.read_csv(stats_global_csv_db)
     student_all_results = exam_stats_df[exam_stats_df['user_id'] == student_id]
     relevant_resutls = student_all_results[student_all_results['exam_id'] == exam_id]
+    relevant_numeric_results = relevant_resutls[relevant_resutls.question_id != 'notes']
+    relevant_string_results = relevant_resutls[relevant_resutls.question_id == 'notes']
     user_plot_results_figure = plot_student_results(students_names[student_id],
-                                                    list(relevant_resutls.question_id.values.flatten()), 
-                                                    list(relevant_resutls.mean_student_mark.values.flatten()))
+                                                    list(relevant_numeric_results.question_id.values.flatten()),
+                                                    list(map(float, relevant_numeric_results.mean_student_mark.values.flatten())))
     user_plot_results_figure.savefig(f'{stats_global_csv_db}_{exam_id}_{student_id}_results.png')
+    if len(relevant_string_results) > 0:
+        return relevant_string_results.mean_student_mark.values.flatten()[0]
 
     #### TODO: реализовать графики с прогрессом, когда накопится история сдач
     # per_question_student_results = student_all_results.groupby(by='question_id')
@@ -85,4 +109,4 @@ def get_student_results(exam_id: int, student_id: int, students_names: List[str]
     #     sorted_question_student_results = question_student_results.sort_values(by='exam_id', axis=0)
     #################
 
-    return relevant_resutls.to_markdown()
+    return ''
