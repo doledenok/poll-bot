@@ -1,3 +1,7 @@
+USER_LANGUAGE = {
+        "en": "Your language is %s.",
+        "ru": "Вы выбрали язык %s."
+}
 CREATE_EXAM = {
         "en": "Create exam",
         "ru": "Создать экзамен"
@@ -10,6 +14,8 @@ CHOOSE_SCENARIO = {
         "en": "Please choose the scenario:",
         "ru": "Пожалуйста, выберите сценарий:"
 }
+
+
 EXAM_ID_ENTERING = {
         "en": "Please enter exam id. Creator of exam should tell it to you:",
         "ru": "Пожалуйста, введите идентификатор экзамена. Создатель экзамена должен сообщить вам об этом:"
@@ -122,7 +128,6 @@ RATE_PARTICIPATION_THANKS = {
         "en": "Thank you for participating in the exam!\nNow you can wait for exam finish to see the global and individual results.\nGood luck!",
         "ru": "Спасибо за участие в экзамене!\nТеперь вы можете дождаться окончания экзамена, чтобы увидеть общие и индивидуальные результаты.\nУдачи!"
 }
-
 
 
 ADMIN_SCENARIO_INFORM = {
