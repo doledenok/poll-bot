@@ -65,7 +65,7 @@
 
 ### Локализовать user.py
 "Пожалуйста, введите идентификатор экзамена. Создатель экзамена должен сообщить вам об этом"
-"Как вы это сделали? Бот работает непоследовательно.".
+"Как вы это сделали? Бот работает непоследовательно."
 "Пожалуйста, введите номер - идентификатор экзамена:"
 "Экзамены не зарегистрированы. Дождитесь создания экзамена"
 "Экзамен %d не зарегистрирован. Пожалуйста, введите существующий идентификатор экзамена:"
@@ -97,15 +97,15 @@
 ### Локализовать admin.py
 "Итак, ваш сценарий - admin"
 "Ваш идентификатор экзамена - %d"
-"Завершите регистрацию и покажите список студентов".
+"Завершите регистрацию и покажите список студентов"
 "Откройте список студентов, когда будете готовы завершить регистрацию и приступить к экзамену:"
-"Зарегистрированного студента нет! Пожалуйста, попробуйте позже".
+"Зарегистрированного студента нет! Пожалуйста, попробуйте позже"
 "Теперь вы можете послушать своих студентов. Когда все ваши студенты закончат свои презентации, пожалуйста, отправьте команду /finish_exam"
 "Ваш экзамен завершен. Теперь мы начинаем суммировать все результаты"
 "Получить результаты для всех студентов"
 "Завершить просмотр результатов"
 "Здесь представлены результаты экзаменов для каждого студента:"
-"Вы нажали кнопку "Готово".Поздравляю! У многих ваших студентов результаты лучше!"
+"Вы нажали кнопку \"Готово\".Поздравляю! У многих ваших студентов результаты лучше!"
 "*%результатов"
 
 
@@ -118,182 +118,178 @@
 
 
 
-MESSAGE_ID = {
-        "en": "### Localize start.py",
-        "ru": "### Локализовать start.py"
-}
-MESSAGE_ID = {
+CREATE_EXAM = {
         "en": "Create exam",
         "ru": "Создать экзамен"
 }
-MESSAGE_ID = {
+JOIN_EXAM = {
         "en": "Join exam",
         "ru": "Присоединиться к экзамену"
 }
-MESSAGE_ID = {
+CHOOSE_SCENARIO = {
         "en": "Please choose the scenario:",
         "ru": "Пожалуйста, выберите сценарий:"
 }
-MESSAGE_ID = {
+EXAM_ID_ENTERING = {
         "en": "Please enter exam id. Creator of exam should tell it to you:",
         "ru": "Пожалуйста, введите идентификатор экзамена. Создатель экзамена должен сообщить вам об этом:"
 }
-MESSAGE_ID = {
+INCONSISTENT_MESSAGE = {
         "en": "How have you done it? Bot is inconsistent.",
-        "ru": "Как вы это сделали? Бот работает непоследовательно."."
+        "ru": "Как вы это сделали? Бот работает непоследовательно."
 }
-MESSAGE_ID = {
+EXAM_ID_ENTERING_NOT_NUMBER_ERROR = {
         "en": "Please enter the number -- exam id:",
         "ru": "Пожалуйста, введите число -- идентификатор экзамена:"
 }
-MESSAGE_ID = {
+EXAM_ID_ENTERING_NO_EXAMS_ERROR = {
         "en": "The is no registrated exams. Wait for exam creation",
         "ru": "Экзамены не зарегистрированы. Дождитесь создания экзамена"
 }
-MESSAGE_ID = {
+EXAM_ID_ENTERING_NOT_REGISTRATED_ERROR = {
         "en": "Exam %d is not registered. Please enter the existed exam id:",
         "ru": "Экзамен %d не зарегистрирован. Пожалуйста, введите идентификатор существующего экзамена:"
 }
-MESSAGE_ID = {
+EXAM_ID_ENTERING_SUCCESS = {
         "en": "Success! You are connected to the exam",
         "ru": "Успешно! Вы подключены к экзамену"
 }
-MESSAGE_ID = {
+NAME_ENTERING = {
         "en": "Please enter your name and surname:",
         "ru": "Пожалуйста, введите ваши имя и фамилию:"
 }
-MESSAGE_ID = {
+NAME_ENTERING_COLLISION_ERROR = {
         "en": "This name already exists! Enter another please",
         "ru": "Это имя уже существует! Введите другое, пожалуйста"
 }
-MESSAGE_ID = {
+START_LISTENING = {
         "en": "Start listening",
         "ru": "Начните прослушивание"
 }
-MESSAGE_ID = {
+GREETING_MESSAGE = {
         "en": "Hello %s!\nLet's wait till exam creator finishes the registration and start our speakers listening.",
         "ru": "Здравствуйте, %s!\nДавайте подождем, пока создатель экзамена завершит регистрацию, и начнем прослушивание наших докладчиков."
 }
-MESSAGE_ID = {
+EXAM_REGISTRATION_NOT_FINISHED = {
         "en": "Sorry, exam creator has not finished exam registration yet. Check it again a bit later.",
         "ru": "Извините, создатель экзамена еще не завершил регистрацию на экзамен. Проверьте это еще раз чуть позже."
 }
-MESSAGE_ID = {
+SPEAKERS_LIST_TO_RATE = {
         "en": "Here is the list of speakers. Choose who you want to rate:",
         "ru": "Вот список выступающих. Выберите, кого вы хотите оценить:"
 }
-MESSAGE_ID = {
+SPEAKER_TO_RATE_CHOICE = {
         "en": "You chose %s",
         "ru": "Оцениваемый студент --- %s"
 }
-MESSAGE_ID = {
+CALMNESS_STORY = {
         "en": "Calmness while telling a story",
         "ru": "Спокойствие при рассказе истории"
 }
-MESSAGE_ID = {
+CALMNESS_QUESTIONS = {
         "en": "Calmness while answering questions",
         "ru": "Спокойствие при ответе на вопросы"
 }
-MESSAGE_ID = {
+EYE_STORY = {
         "en": "Eye contact while telling a story",
         "ru": "Зрительный контакт при рассказе истории"
 }
-MESSAGE_ID = {
+EYE_QUESTIONS = {
         "en": "Eye contact while answering questions",
         "ru": "Зрительный контакт при ответе на вопросы"
 }
-MESSAGE_ID = {
+ANSWER_SKILL = {
         "en": "The skill to answer questions",
         "ru": "Умение отвечать на вопросы"
 }
-MESSAGE_ID = {
+NOTES_OF_LISTENER = {
         "en": "Notes about performance",
         "ru": "Замечания о выступлении"
 }
-MESSAGE_ID = {
+CHOOSE_ANOTHER_SPEAKER = {
         "en": "Choose another speaker",
         "ru": "Выберите другого докладчика"
 }
-MESSAGE_ID = {
+FINISH_RATING = {
         "en": "Finish rating",
         "ru": "Завершить оценивание"
 }
-MESSAGE_ID = {
+CHOOSE_FIELD_TO_RATE = {
         "en": "Choose what do you want to rate:",
         "ru": "Выберите, что вы хотите оценить:"
 }
-MESSAGE_ID = {
+RATE_ENTERING_NOT_NUMBER_ERROR = {
         "en": "Please enter the number!",
         "ru": "Пожалуйста, введите номер!"
 }
-MESSAGE_ID = {
+RATE_ENTERING_RANGE_ERROR = {
         "en": "Please enter the number between 0 and 10!",
         "ru": "Пожалуйста, введите число от 0 до 10!"
 }
-MESSAGE_ID = {
+RATE_ENTERING_DESCRIPTION = {
         "en": "Input number from 0 to 10 where 10 is excellent",
         "ru": "Введите число от 0 до 10, где 10 - отлично"
 }
-MESSAGE_ID = {
+RATE_ENTERING_THANKS = {
         "en": "Thanks! Stored.",
         "ru": "Спасибо! Сохранено."
 }
-MESSAGE_ID = {
+NOTES_OF_LISTENER_ENTERING = {
         "en": "Enter notes you want to save:",
         "ru": "Введите заметки, которые вы хотите сохранить:"
 }
-MESSAGE_ID = {
+RATE_PARTICIPATION_THANKS = {
         "en": "Thank you for participating in the exam!\nNow you can wait for exam finish to see the global and individual results.\nGood luck!",
         "ru": "Спасибо за участие в экзамене!\nТеперь вы можете дождаться окончания экзамена, чтобы увидеть общие и индивидуальные результаты.\nУдачи!"
 }
 
 
 
-MESSAGE_ID = {
+ADMIN_SCENARIO_INFORM = {
         "en": "So your scenario is admin",
         "ru": "Итак, ваш сценарий - администратор экзамена"
 }
-MESSAGE_ID = {
+EXAM_ID_CREATION = {
         "en": "Your exam id is %d",
         "ru": "Ваш идентификатор экзамена - %d"
 }
-MESSAGE_ID = {
+EXAM_REGISTRATION_FINISH_PLUS_STUDENTS_LIST = {
         "en": "Finish registration and show students list",
         "ru": "Завершить регистрацию и показать список студентов."
 }
-MESSAGE_ID = {
+EXAM_REGISTRATION_FINISHING_DESCRIPTION = {
         "en": "Open students list when you are ready to finish registration and to start exam:",
         "ru": "Откройте список студентов, когда будете готовы завершить регистрацию и приступить к экзамену:"
 }
-MESSAGE_ID = {
+EXAM_REGISTRATION_FINISHING_NO_STUDENTS_ERROR = {
         "en": "No registered student! Please try later.",
-        "ru": "Ни одного студента не зарегистрировано! Пожалуйста, попробуйте позже"."
+        "ru": "Ни одного студента не зарегистрировано! Пожалуйста, попробуйте позже"
 }
-MESSAGE_ID = {
+EXAM_STARTING_PLUS_EXAM_FINISH_COMMAND = {
         "en": "Now you can listen to your students. When all your students finish their presentations, please, send command /finish_exam",
         "ru": "Теперь вы можете послушать своих студентов. Когда все ваши студенты закончат свои презентации, пожалуйста, отправьте команду /finish_exam"
 }
-MESSAGE_ID = {
+EXAM_FINISH_PLUS_RESULTS_AGGREGATION = {
         "en": "Your exam is finished. Now we start to aggregate all results",
         "ru": "Ваш экзамен завершен. Теперь мы начинаем агрегировать результаты"
 }
-MESSAGE_ID = {
+EXAM_ALL_RESULTS = {
         "en": "Get results for all students",
         "ru": "Получить результаты для всех студентов"
 }
-MESSAGE_ID = {
+EXAM_FINISH_REVIEW = {
         "en": "Finish results review",
         "ru": "Завершить просмотр результатов"
 }
-MESSAGE_ID = {
+EXAM_PER_STUDENT_RESULTS = {
         "en": "Your per-student exam results are here:",
         "ru": "Здесь представлены результаты экзаменов для каждого студента:"
 }
-MESSAGE_ID = {
+EXAM_FINISH_REVIEW_DESCRIPTION = {
         "en": "You've clicked finish-button.\nCongratulations! A lot of your students are doing better!",
         "ru": "Вы нажали кнопку \"Готово\".\nПоздравляем! Результаты многих ваших студентов стали лучше!"
 }
-MESSAGE_ID = {
+EXAM_INDIVIDUAL_RESULTS = {
         "en": "*%s* results",
         "ru": "*%s*. Результаты."
 }
