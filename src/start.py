@@ -35,7 +35,7 @@ async def choosing_language(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user_language not in ["en", "ru"]:
         print(f'Strange query data {query.data} in admin_main', file=sys.stderr)
         return
-    
+
     context.user_data["user_language"] = user_language
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=messages.USER_LANGUAGE[user_language] % user_language)
