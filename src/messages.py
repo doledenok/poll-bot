@@ -20,7 +20,7 @@ EXAM_ID_ENTERING = {
         "en": "Please enter exam id. Creator of exam should tell it to you:",
         "ru": "Пожалуйста, введите идентификатор экзамена. Создатель экзамена должен сообщить вам об этом:"
 }
-INCONSISTENT_MESSAGE = {
+INCONSISTENCY_MESSAGE = {
         "en": "How have you done it? Bot is inconsistent.",
         "ru": "Как вы это сделали? Бот работает непоследовательно."
 }
