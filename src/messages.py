@@ -176,5 +176,5 @@ EXAM_FINISH_REVIEW_DESCRIPTION = {
 }
 EXAM_INDIVIDUAL_RESULTS = {
         "en": "*%s* results",
-        "ru": "*%s*. Результаты."
+        "ru": "*%s*\. Результаты\."
 }
