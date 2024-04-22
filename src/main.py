@@ -3,7 +3,7 @@ import sys
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, CallbackQueryHandler, ConversationHandler
 
-from start import start, CHOOSING_ROLE
+from start import start, choosing_language, CHOOSING_ROLE, CHOOSING_LANGUAGE
 from admin import admin_main, admin_states
 from user import user_main, user_states
 
@@ -16,10 +16,13 @@ def main():
     application = ApplicationBuilder().token(token).build()
 
     states = {
+            CHOOSING_LANGUAGE: [
+                CallbackQueryHandler(choosing_language, pattern="^interface_language"),
+            ],
             CHOOSING_ROLE: [
                 CallbackQueryHandler(admin_main, pattern="^admin_start"),
                 CallbackQueryHandler(user_main, pattern="^user_start"),
-            ],
+            ]
         }
     states |= admin_states | user_states
 
