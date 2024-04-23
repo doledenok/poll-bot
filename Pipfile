@@ -1,0 +1,28 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+python-telegram-bot = "*"
+python-dotenv = "*"
+numpy = "*"
+pandas = "*"
+matplotlib = "*"
+
+[dev-packages]
+flake8 = "*"
+pydocstyle = "*"
+sphinx = "*"
+myst-parser = "*"
+sphinx-rtd-theme = "*"
+doit = "*"
+tomli = "*"
+pybabel = "*"
+build = "*"
+pytest = "*"
+telebot = "*"
+mypy = "*"
+
+[requires]
+python_version = "3.10"

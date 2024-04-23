@@ -1,0 +1,5 @@
+python-telegram-bot
+matplotlib
+pandas
+numpy
+pytest
