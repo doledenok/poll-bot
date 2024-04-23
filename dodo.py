@@ -9,7 +9,7 @@ DOIT_CONFIG = {'default_tasks': ['wheel']}
 def task_html():
     """Build documentation-html for project."""
     return {
-        'actions': ['sphinx-build -M html ./doc/ ./doc/_build'],
+        'actions': ['make -C docs html'],
         'file_dep' : glob.glob("*.py") + glob.glob("*.rst"),
     }
 
@@ -26,14 +26,14 @@ def task_test():
             'verbosity': 2
     }
 
-    
+
 def task_docstyle():
     """Check docstrings in src code files."""
     return {
             'actions': ['pydocstyle ./src'],
             'verbosity': 2
     }
-    
+
 def task_codestyle():
     """Check code in src directory."""
     return {

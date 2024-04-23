@@ -9,19 +9,15 @@ python-dotenv = "*"
 numpy = "*"
 pandas = "*"
 matplotlib = "*"
+pytest = "*"
 
 [dev-packages]
 flake8 = "*"
 pydocstyle = "*"
 sphinx = "*"
 myst-parser = "*"
-sphinx-rtd-theme = "*"
 doit = "*"
-tomli = "*"
-pybabel = "*"
-build = "*"
 pytest = "*"
-telebot = "*"
 mypy = "*"
 
 [requires]
