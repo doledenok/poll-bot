@@ -14,7 +14,7 @@
 
 Приблизительный сценарий работы бота:
 
-![Приблизительный сценарий работы бота](doc/scenario.jpg)
+![Приблизительный сценарий работы бота](docs/source/_static/scenario.jpg)
 
 ## Интерфейса
 
@@ -23,4 +23,10 @@
 ### Примеры интерфейса:
 
 Стартовый выбор сценария
-![start](doc/start.jpg)
+![start](docs/source/_static/start.jpg)
+
+Проведение экзамена
+![exam_managing](docs/source/_static/exam_managing.jpg)
+
+Просмотр результатов экзамена
+![review_exam_results](docs/source/_static/review_exam_results.jpg)
