@@ -29,18 +29,19 @@
 
 Организатор. Проведение экзамена
 
-![](https://raw.githubusercontent.com/doledenok/poll-bot/main/docs/source/_static/exam_managing.jpg){width="50%"}
+![](https://raw.githubusercontent.com/doledenok/poll-bot/main/docs/source/_static/exam_managing.jpg)
 ----
 
 Организатор. Просмотр результатов экзамена
 
-![](https://raw.githubusercontent.com/doledenok/poll-bot/main/docs/source/_static/review_exam_results.jpg){width="50%"}
-
+![](https://raw.githubusercontent.com/doledenok/poll-bot/main/docs/source/_static/review_exam_results.jpg)
+----
 
 Студент. Регистрация на экзамен
 
-![](https://raw.githubusercontent.com/doledenok/poll-bot/main/docs/source/_static/user_exam_joining.jpg){width="50%"}
+![](https://raw.githubusercontent.com/doledenok/poll-bot/main/docs/source/_static/user_exam_joining.jpg)
+----
 
 Студент. Оценка выступающих
 
-![](https://raw.githubusercontent.com/doledenok/poll-bot/main/docs/source/_static/user_rating.jpg){width="50%"}
+![](https://raw.githubusercontent.com/doledenok/poll-bot/main/docs/source/_static/user_rating.jpg)
