@@ -14,7 +14,7 @@
 
 Приблизительный сценарий работы бота:
 
-![Приблизительный сценарий работы бота](docs/source/_static/scenario.jpg)
+![Приблизительный сценарий работы бота](https://raw.githubusercontent.com/doledenok/poll-bot/main/docs/source/_static/scenario.jpg)
 
 ## Интерфейса
 
