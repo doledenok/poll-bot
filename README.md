@@ -23,10 +23,14 @@
 ### Примеры интерфейса:
 
 Стартовый выбор сценария
-![start](docs/source/_static/start.jpg)
+![Стартовый выбор сценария](docs/source/_static/start.jpg)
+
 
 Проведение экзамена
-![exam_managing](docs/source/_static/exam_managing.jpg)
+
+![Проведение экзамена](docs/source/_static/exam_managing.jpg)
+
 
 Просмотр результатов экзамена
-![review_exam_results](docs/source/_static/review_exam_results.jpg)
+
+![Просмотр результатов экзамена](docs/source/_static/review_exam_results.jpg)
