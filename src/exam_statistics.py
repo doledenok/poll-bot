@@ -33,7 +33,9 @@ def plot_student_results(student_name: str, questions: List[str], scores: List[f
 
 def calculate_individual_stats(exam_user_marks_df: pd.DataFrame) -> pd.DataFrame:
     """Calculate statistics of only student and return it as DataFrame."""
-    per_question_user_marks = exam_user_marks_df.loc[:, ('question_id', 'student_mark')].groupby(by='question_id')
+    question_mark_df = exam_user_marks_df.loc[:, ('question_id', 'student_mark')]
+    question_mark_df.student_mark = question_mark_df.student_mark.astype('string').str.strip().astype('float')
+    per_question_user_marks = question_mark_df.groupby(by='question_id')
     mean_per_question_user_marks = per_question_user_marks.mean().rename(columns={'student_mark': 'mean_student_mark'})
     median_per_question_user_marks = per_question_user_marks.median().rename(
         columns={'student_mark': 'median_student_mark'}
