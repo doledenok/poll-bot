@@ -1,11 +1,15 @@
+"""Processing statistics of exam."""
+
+import os
+from typing import List, Dict
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.figure
-from typing import List, Dict
-import os
 
 
 def plot_student_results(student_name: str, questions: List[str], scores: List[float]) -> matplotlib.figure.Figure:
+    """Return student score as a plot."""
     fig, ax1 = plt.subplots(figsize=(9, 7), layout='constrained')
     fig.canvas.manager.set_window_title('Eldorado K-8 Fitness Chart')
 
@@ -28,6 +32,7 @@ def plot_student_results(student_name: str, questions: List[str], scores: List[f
 
 
 def calculate_individual_stats(exam_user_marks_df: pd.DataFrame) -> pd.DataFrame:
+    """Calculate statistics of only student and return it as DataFrame."""
     per_question_user_marks = exam_user_marks_df.loc[:, ('question_id', 'student_mark')].groupby(by='question_id')
     mean_per_question_user_marks = per_question_user_marks.mean().rename(columns={'student_mark': 'mean_student_mark'})
     median_per_question_user_marks = per_question_user_marks.median().rename(
@@ -49,6 +54,7 @@ def calculate_individual_stats(exam_user_marks_df: pd.DataFrame) -> pd.DataFrame
 
 
 def calculate_exam_stats(exam_id: int, exam_marks_csv: str, stats_global_csv_db: str) -> None:
+    """Calculate all statistics about exam with exam_id and store it in stats_global_csv_db file."""
     exam_marks_df = pd.read_csv(exam_marks_csv)
 
     relevant_exam_df = exam_marks_df.loc[exam_marks_df.exam_id == exam_id]
@@ -81,6 +87,7 @@ def calculate_exam_stats(exam_id: int, exam_marks_csv: str, stats_global_csv_db:
 
 
 def get_exam_results(exam_id: int, students_names: List[str], stats_global_csv_db: str) -> Dict[int, str]:
+    """Return exam result for each student in string form."""
     exam_stats_df = pd.read_csv(stats_global_csv_db)
     relevant_resutls = exam_stats_df[exam_stats_df['exam_id'] == exam_id]
     per_user_relevant_resutls = relevant_resutls.groupby(by='user_id')
@@ -104,6 +111,7 @@ def get_exam_results(exam_id: int, students_names: List[str], stats_global_csv_d
 
 
 def get_student_results(exam_id: int, student_id: int, students_names: List[str], stats_global_csv_db: str) -> str:
+    """Return exam result for only student."""
     exam_stats_df = pd.read_csv(stats_global_csv_db)
     student_all_results = exam_stats_df[exam_stats_df['user_id'] == student_id]
     relevant_resutls = student_all_results[student_all_results['exam_id'] == exam_id]
@@ -118,7 +126,7 @@ def get_student_results(exam_id: int, student_id: int, students_names: List[str]
     if len(relevant_string_results) > 0:
         return relevant_string_results.mean_student_mark.values.flatten()[0]
 
-    #### TODO: реализовать графики с прогрессом, когда накопится история сдач
+    # TODO: реализовать графики с прогрессом, когда накопится история сдач
     # per_question_student_results = student_all_results.groupby(by='question_id')
     # question_ids = per_question_student_results.groups.keys()
     # for question_id in question_ids:

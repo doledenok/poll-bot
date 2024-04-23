@@ -1,7 +1,9 @@
+"""The start of conversation without separation on roles."""
+
 import sys
 
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, CallbackQueryHandler, ConversationHandler
+from telegram.ext import ContextTypes
 
 import messages
 
@@ -12,7 +14,9 @@ CHOOSING_ROLE = 1
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
-    Output the start menu with role choice - admin or user.
+    Handle the /start command.
+
+    Print the start menu with role choice - admin or user.
     """
     keyboard = [
         [
@@ -30,6 +34,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def choosing_language(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Invite user to choose the interface language - english or russian."""
     query = update.callback_query
     await query.answer()
 

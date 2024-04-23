@@ -1,7 +1,9 @@
+"""The script file that runs the telegram poll bot."""
+
 import os
 import sys
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, CallbackQueryHandler, ConversationHandler
+
+from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ConversationHandler
 
 from start import start, choosing_language, CHOOSING_ROLE, CHOOSING_LANGUAGE
 from admin import admin_main, admin_states
@@ -9,6 +11,7 @@ from user import user_main, user_states
 
 
 def main():
+    """Configure and run telegram bot."""
     if not (token := os.environ.get("TELEGRAM_POLL_BOT_TOKEN")):
         print("Can't find telegram token! Please set TELEGRAM_POLL_BOT_TOKEN environment variable.")
         sys.exit(1)

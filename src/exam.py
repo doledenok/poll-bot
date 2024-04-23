@@ -1,3 +1,5 @@
+"""Info about exam."""
+
 import os
 import enum
 import csv
@@ -5,32 +7,26 @@ from typing import List, Dict
 
 
 class ExamStatus(enum.Enum):
+    """Current exam status."""
+
     Created = 0
     RegistrationFinished = 1
     PresentationsFinished = 2
     ResultsReviewFinished = 3
 
 
-class ExaminatedSkills(enum.Enum):
-    CalmnessStory = 0
-    CalmnessQuestions = 1
-    EyeContactStory = 2
-    EyeContactQuesitons = 3
-    AnswerSkill = 4
-    Notes = 5
-
-
 class Exam:
+    """Info about current exam."""
+
     def __init__(self, id: int):
+        """Create exam with id."""
         self.exam_id = id
         self.speaker_names: List[str] = []
         self.speaker_answers: List[Dict[int, dict]] = []
         self.exam_status: ExamStatus = ExamStatus.Created
 
     def add_speaker(self, name: str) -> int | None:
-        """
-        Return participant id or None if name is not unique.
-        """
+        """Return participant id or None if name is not unique."""
         if name in self.speaker_names:
             return None
         self.speaker_names.append(name)
@@ -38,22 +34,22 @@ class Exam:
         return len(self.speaker_names) - 1
 
     def get_speaker_names(self, speaker_id: int = None) -> list:
-        """
-        If speaker_id is not None return all speaker names except speaker with that id.
-        """
+        """If speaker_id is not None return all speaker names except speaker with that id."""
         if speaker_id is None:
             return self.speaker_names
         without_one_speakers = self.speaker_names[:speaker_id]
         if speaker_id >= len(self.speaker_names) - 1:
             return without_one_speakers
-        return without_one_speakers + self.speaker_names[speaker_id + 1 :]
+        return without_one_speakers + self.speaker_names[speaker_id + 1:]
 
     def get_name_by_id(self, speaker_id: int) -> str:
+        """Return name of speaker by its id."""
         return self.speaker_names[speaker_id]  # если вдруг слишком большой id - пусть падает
 
     def add_answer(self, listener_id: int, speaker_id: int, field: str, value: int | str):
         """
         Store score of some criteria for listener and speaker.
+
         Criteria are:
         - calmness_story
         - calmness_questions
@@ -67,6 +63,7 @@ class Exam:
         self.speaker_answers[listener_id][speaker_id][field] = value
 
     def save_results(self, exams_csv_db: str) -> None:
+        """Save all result of exam in csv file."""
         saved_rows = 0
         with open(exams_csv_db, 'a+', newline='') as csvfile:
             fieldnames = ['exam_id', 'answering_student_id', 'listening_student_id', 'question_id', 'student_mark']

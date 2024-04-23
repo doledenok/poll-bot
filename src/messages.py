@@ -1,3 +1,5 @@
+"""Messages from telegram bot on english and russian for localization."""
+
 USER_LANGUAGE = {"en": "Your language is %s.", "ru": "Вы выбрали язык %s."}
 CREATE_EXAM = {"en": "Create exam", "ru": "Создать экзамен"}
 JOIN_EXAM = {"en": "Join exam", "ru": "Присоединиться к экзамену"}
@@ -33,7 +35,8 @@ NAME_ENTERING_COLLISION_ERROR = {
 START_LISTENING = {"en": "Start listening", "ru": "Начните прослушивание"}
 GREETING_MESSAGE = {
     "en": "Hello %s!\nLet's wait till exam creator finishes the registration and start our speakers listening.",
-    "ru": "Здравствуйте, %s!\nДавайте подождем, пока создатель экзамена завершит регистрацию, и начнем прослушивание наших докладчиков.",
+    "ru": "Здравствуйте, %s!\nДавайте подождем, пока создатель экзамена завершит регистрацию,"
+          "и начнем прослушивание наших докладчиков.",
 }
 EXAM_REGISTRATION_NOT_FINISHED = {
     "en": "Sorry, exam creator has not finished exam registration yet. Check it again a bit later.",
@@ -68,8 +71,10 @@ NOTES_OF_LISTENER_ENTERING = {
     "ru": "Введите заметки, которые вы хотите сохранить:",
 }
 RATE_PARTICIPATION_THANKS = {
-    "en": "Thank you for participating in the exam!\nNow you can wait for exam finish to see the global and individual results.\nGood luck!",
-    "ru": "Спасибо за участие в экзамене!\nТеперь вы можете дождаться окончания экзамена, чтобы увидеть общие и индивидуальные результаты.\nУдачи!",
+    "en": "Thank you for participating in the exam!\nNow you can wait for exam finish to see the global "
+          "and individual results.\nGood luck!",
+    "ru": "Спасибо за участие в экзамене!\nТеперь вы можете дождаться окончания экзамена, чтобы увидеть "
+          "общие и индивидуальные результаты.\nУдачи!",
 }
 
 
@@ -88,8 +93,10 @@ EXAM_REGISTRATION_FINISHING_NO_STUDENTS_ERROR = {
     "ru": "Ни одного студента не зарегистрировано! Пожалуйста, попробуйте позже",
 }
 EXAM_STARTING_PLUS_EXAM_FINISH_COMMAND = {
-    "en": "Now you can listen to your students. When all your students finish their presentations, please, send command /finish_exam",
-    "ru": "Теперь вы можете послушать своих студентов. Когда все ваши студенты закончат свои презентации, пожалуйста, отправьте команду /finish_exam",
+    "en": "Now you can listen to your students. When all your students finish their presentations, "
+          "please, send command /finish_exam",
+    "ru": "Теперь вы можете послушать своих студентов. Когда все ваши студенты закончат свои презентации, "
+          "пожалуйста, отправьте команду /finish_exam",
 }
 EXAM_FINISH_PLUS_RESULTS_AGGREGATION = {
     "en": "Your exam is finished. Now we start to aggregate all results",
@@ -102,10 +109,10 @@ EXAM_PER_STUDENT_RESULTS = {
     "ru": "Здесь представлены результаты экзаменов для каждого студента:",
 }
 EXAM_FINISH_REVIEW_DESCRIPTION = {
-    "en": "You've clicked finish-button.\nCongratulations! A lot of your students are doing better!",
-    "ru": "Вы нажали кнопку \"Готово\".\nПоздравляем! Результаты многих ваших студентов стали лучше!",
+    "en": "You've clicked finish-button.\nCongratulations! See you soon!",
+    "ru": "Вы завершили экзамен.\nПоздравляем! До новых встреч!",
 }
 EXAM_INDIVIDUAL_RESULTS = {
-    "en": "*%s* results\.\nListeners notes:\n```Notes\n%s\n```",
-    "ru": "*%s*\. Результаты\.\nЗамечания слушателей:\n```Замечания\n%s\n```",
+    "en": "*%s* results.\nListeners notes:\n```Notes\n%s\n```",
+    "ru": "*%s*. Результаты.\nЗамечания слушателей:\n```Замечания\n%s\n```",
 }

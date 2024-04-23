@@ -1,19 +1,19 @@
-import os
-import sys
-import random
-import datetime
-import csv
-import telegram
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, CallbackQueryHandler, ConversationHandler
-from exam import Exam, ExamStatus
-from user import user_main, user_states
-import statistics
+"""Admin role realization."""
 
+import sys
+import os
+import random
+
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, constants
+from telegram.ext import CommandHandler, ContextTypes, CallbackQueryHandler
+
+from start import start
+from exam import Exam, ExamStatus
+import exam_statistics
 import messages
 
-EXAMS_DATABASE_PATH = '/home/knikorov/Studing/PythonDevelopment2024/poll-bot/data/exams_db.csv'
-STATISTICS_DATABASE_PATH = '/home/knikorov/Studing/PythonDevelopment2024/poll-bot/data/exams_stats_db.csv'
+EXAMS_DATABASE_PATH = os.path.join(os.environ.get("TELEGRAM_POLL_BOT_DATA", os.getcwd()), "exams_db.csv")
+STATISTICS_DATABASE_PATH = os.path.join(os.environ.get("TELEGRAM_POLL_BOT_DATA", os.getcwd()), "exams_stats_db.csv")
 
 ADMIN_STATES_BASE = 10
 AWAITING_FOR_EXAM_REGISTRATION_FINISH = ADMIN_STATES_BASE + 0
@@ -23,6 +23,11 @@ ADMIN_FINISH_EXAM_RESULTS_REVIEW = ADMIN_STATES_BASE + 3
 
 
 async def admin_main(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    First function of admin role.
+
+    It is called after user choose the creating exam scenario.
+    """
     query = update.callback_query
     await query.answer()
     user_language = context.user_data["user_language"]
@@ -34,17 +39,14 @@ async def admin_main(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print(f'Strange query data {query.data} in admin_main', file=sys.stderr)
         return
 
-    #### TODO: раскомментить
-    generated_exam_id = int(
-        1
-    )  # int(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))  # TODO: идеально случайно сгенерированный id
-    #################
+    generated_exam_id = random.randrange(100, 1000)  # явно не идеальный вариант
     if "exams" not in context.bot_data:
         context.bot_data["exams"] = {}
     context.bot_data["exams"][generated_exam_id] = Exam(generated_exam_id)
     context.user_data["exam_id"] = generated_exam_id
     context.user_data["exam"] = context.bot_data["exams"][generated_exam_id]
-    #### TODO: убрать
+
+    # TODO: убрать
     context.bot_data["exams"][generated_exam_id].add_speaker("Max Doledenok")
     context.bot_data["exams"][generated_exam_id].add_speaker("Kirill Nikorov")
     #################
@@ -57,6 +59,7 @@ async def admin_main(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def admin_print_exam_registration_finish(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Send invitation to exam admin to finish exam registration."""
     user_language = context.user_data["user_language"]
     keyboard = [
         [
@@ -75,6 +78,7 @@ async def admin_print_exam_registration_finish(update: Update, context: ContextT
 
 
 async def admin_exam_registration_finish(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Print list of registered students and send invitation to exam admin to finish exam."""
     query = update.callback_query
     await query.answer()
     user_language = context.user_data["user_language"]
@@ -98,9 +102,7 @@ async def admin_exam_registration_finish(update: Update, context: ContextTypes.D
 
 
 async def admin_finish_exam_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """
-    Output the start menu with role choice - admin or user.
-    """
+    """Save exam data and invite admin to look at them."""
     user_language = context.user_data["user_language"]
 
     context.user_data["exam"].exam_status = ExamStatus.PresentationsFinished
@@ -111,7 +113,7 @@ async def admin_finish_exam_command(update: Update, context: ContextTypes.DEFAUL
     saved_rows = context.user_data["exam"].save_results(EXAMS_DATABASE_PATH)
     print(f'Processed and saved {saved_rows} rows for exam {context.user_data["exam_id"]}', file=sys.stdout)
 
-    statistics.calculate_exam_stats(context.user_data["exam_id"], EXAMS_DATABASE_PATH, STATISTICS_DATABASE_PATH)
+    exam_statistics.calculate_exam_stats(context.user_data["exam_id"], EXAMS_DATABASE_PATH, STATISTICS_DATABASE_PATH)
 
     # Видимо, это лучше сделать через KeyboardMarkup, чтобы не спамить каждый раз таблицей-сообщением
     student_list_for_exam = context.user_data["exam"].get_speaker_names()
@@ -135,10 +137,10 @@ async def admin_finish_exam_command(update: Update, context: ContextTypes.DEFAUL
             )
         keyboard.append(current_row)
     keyboard.append(
-        [InlineKeyboardButton(messages.EXAM_ALL_RESULTS[user_language], callback_data=f"admin_all_students_results")]
+        [InlineKeyboardButton(messages.EXAM_ALL_RESULTS[user_language], callback_data="admin_all_students_results")]
     )
     keyboard.append(
-        [InlineKeyboardButton(messages.EXAM_FINISH_REVIEW[user_language], callback_data=f"admin_finish_review_results")]
+        [InlineKeyboardButton(messages.EXAM_FINISH_REVIEW[user_language], callback_data="admin_finish_review_results")]
     )
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -152,6 +154,7 @@ async def admin_finish_exam_command(update: Update, context: ContextTypes.DEFAUL
 
 
 async def admin_choosing_student_for_exam_results_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Invite admin to look students statistics."""
     query = update.callback_query
     await query.answer()
     user_language = context.user_data["user_language"]
@@ -164,35 +167,32 @@ async def admin_choosing_student_for_exam_results_button(update: Update, context
         await context.bot.send_message(
             chat_id=update.effective_chat.id, text=messages.EXAM_FINISH_REVIEW_DESCRIPTION[user_language]
         )
-        return ADMIN_FINISH_EXAM_RESULTS_REVIEW
+        return await start(update, context)
 
     exam_id = context.user_data["exam_id"]
     students_names = context.user_data["exam"].get_speaker_names()
     if query.data == 'admin_all_students_results':
-        exam_results = statistics.get_exam_results(exam_id, students_names, STATISTICS_DATABASE_PATH)
+        exam_results = exam_statistics.get_exam_results(exam_id, students_names, STATISTICS_DATABASE_PATH)
         for student_id, student_result in exam_results.items():
             student_name = students_names[student_id]
-            # await context.bot.send_message(chat_id=update.effective_chat.id, text=f"*{student_name}* results are\n```{student_result}```\n\n",
-            #                                parse_mode=telegram.constants.ParseMode.MARKDOWN_V2)
             await context.bot.send_photo(
                 chat_id=update.effective_chat.id,
                 photo=f'{STATISTICS_DATABASE_PATH}_{exam_id}_{student_id}_results.png',
                 caption=messages.EXAM_INDIVIDUAL_RESULTS[user_language] % (student_name, student_result),
-                parse_mode=telegram.constants.ParseMode.MARKDOWN_V2,
+                parse_mode=constants.ParseMode.MARKDOWN_V2,
             )
     elif query.data.startswith("admin_student_"):
         student_id = int(query.data.split('_')[2])
         student_name = students_names[student_id]
-        student_result = statistics.get_student_results(exam_id, student_id, students_names, STATISTICS_DATABASE_PATH)
-        # results = ["perfect", "good", "bad"]
-        # student_result = random.choice(results)
-        # await context.bot.send_message(chat_id=update.effective_chat.id, text=f"*{student_name}* results are\n```{student_result}```",
-        #                                parse_mode=telegram.constants.ParseMode.MARKDOWN_V2)
+        student_result = exam_statistics.get_student_results(
+            exam_id, student_id, students_names, STATISTICS_DATABASE_PATH
+        )
+
         await context.bot.send_photo(
             chat_id=update.effective_chat.id,
             photo=f'{STATISTICS_DATABASE_PATH}_{exam_id}_{student_id}_results.png',
             caption=messages.EXAM_INDIVIDUAL_RESULTS[user_language] % (student_name, student_result),
-            parse_mode=telegram.constants.ParseMode.MARKDOWN_V2,
+            parse_mode=constants.ParseMode.MARKDOWN_V2,
         )
     else:
         print(f'Strange query data {query.data} in admin_exam_registration_finish', file=sys.stderr)
@@ -219,10 +219,10 @@ async def admin_choosing_student_for_exam_results_button(update: Update, context
             )
         keyboard.append(current_row)
     keyboard.append(
-        [InlineKeyboardButton(messages.EXAM_ALL_RESULTS[user_language], callback_data=f"admin_all_students_results")]
+        [InlineKeyboardButton(messages.EXAM_ALL_RESULTS[user_language], callback_data="admin_all_students_results")]
     )
     keyboard.append(
-        [InlineKeyboardButton(messages.EXAM_FINISH_REVIEW[user_language], callback_data=f"admin_finish_review_results")]
+        [InlineKeyboardButton(messages.EXAM_FINISH_REVIEW[user_language], callback_data="admin_finish_review_results")]
     )
     reply_markup = InlineKeyboardMarkup(keyboard)
 
