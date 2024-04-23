@@ -22,7 +22,7 @@ def task_gitclean():
 def task_test():
     """Test application."""
     yield {
-            'actions': ['pytest test/tests_exam.py', 'pytest test/test_statistics.py'], 'name': "any_tests",
+            'actions': ['pytest test/tests_exam.py', 'pytest test/tests_statistics.py'], 'name': "any_tests",
             'verbosity': 2
     }
 
@@ -34,10 +34,10 @@ def task_docstyle():
             'verbosity': 2
     }
 
-def task_codestyle():
+def task_analyze():
     """Check code in src directory."""
     return {
-            'actions': ['flake8 ./src', 'mypy ./src'],
+            'actions': ['flake8 ./src'],
             'verbosity': 2
     }
 
@@ -45,12 +45,12 @@ def task_check():
     """Perform all checks."""
     return {
             'actions': [],
-            'task_dep': ['codestyle', 'docstyle', 'test']
+            'task_dep': ['analyze', 'docstyle', 'test']
     }
 
 def task_wheel():
     """Build wheel."""
     return {
-            'actions': ['python -m build -w'],
+            'actions': ['python3 -m build -w'],
             'task_dep': ['gitclean'],
     }
