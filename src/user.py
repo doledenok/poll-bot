@@ -93,8 +93,7 @@ async def user_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["user_id"] = user_id
     keyboard = [[InlineKeyboardButton(messages.START_LISTENING[user_language], callback_data="user_start_listening")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text(messages.GREETING_MESSAGE[user_language] % name,
-                                    reply_markup=reply_markup)
+    await update.message.reply_text(messages.GREETING_MESSAGE[user_language] % name, reply_markup=reply_markup)
     return USER_SHOW_LIST_OF_SPEAKERS
 
 
@@ -104,17 +103,29 @@ async def user_show_list_of_speakers(update: Update, context: ContextTypes.DEFAU
     user_language = context.user_data["user_language"]
 
     while context.user_data["exam"].exam_status != ExamStatus.RegistrationFinished:
-        keyboard = [[InlineKeyboardButton(messages.START_LISTENING[user_language], callback_data="user_start_listening")]]
+        keyboard = [
+            [InlineKeyboardButton(messages.START_LISTENING[user_language], callback_data="user_start_listening")]
+        ]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await context.bot.send_message(update.effective_chat.id,
-                                       text=messages.EXAM_REGISTRATION_NOT_FINISHED[user_language],
-                                       reply_markup=reply_markup)
+        await context.bot.send_message(
+            update.effective_chat.id,
+            text=messages.EXAM_REGISTRATION_NOT_FINISHED[user_language],
+            reply_markup=reply_markup,
+        )
         return USER_SHOW_LIST_OF_SPEAKERS
 
     speakers = context.user_data["exam"].get_speaker_names(context.user_data["user_id"])
-    keyboard = [[InlineKeyboardButton(f"{speakers[j]}", callback_data=f"user_speaker{j}") for j in range(i, min(len(speakers), i + 3))] for i in range(0, len(speakers), 3)]
+    keyboard = [
+        [
+            InlineKeyboardButton(f"{speakers[j]}", callback_data=f"user_speaker{j}")
+            for j in range(i, min(len(speakers), i + 3))
+        ]
+        for i in range(0, len(speakers), 3)
+    ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await context.bot.send_message(update.effective_chat.id, messages.SPEAKERS_LIST_TO_RATE[user_language], reply_markup=reply_markup)
+    await context.bot.send_message(
+        update.effective_chat.id, messages.SPEAKERS_LIST_TO_RATE[user_language], reply_markup=reply_markup
+    )
     return USER_STORE_SPEAKER_ID
 
 
@@ -124,13 +135,16 @@ async def user_store_speaker_id(update: Update, context: ContextTypes.DEFAULT_TY
     user_language = context.user_data["user_language"]
 
     if query.data.startswith("user_speaker"):
-        speaker_id = int(query.data[len("user_speaker"):])
+        speaker_id = int(query.data[len("user_speaker") :])
         context.user_data["speaker_id"] = speaker_id
     else:
         await query.answer(messages.INCONSISTENCY_MESSAGE[user_language])
         return
 
-    await context.bot.send_message(update.effective_chat.id, messages.SPEAKER_TO_RATE_CHOICE[user_language] % context.user_data['exam'].get_name_by_id(speaker_id))
+    await context.bot.send_message(
+        update.effective_chat.id,
+        messages.SPEAKER_TO_RATE_CHOICE[user_language] % context.user_data['exam'].get_name_by_id(speaker_id),
+    )
     return await user_show_criteria(update, context)
 
 
@@ -138,7 +152,11 @@ async def user_show_criteria(update: Update, context: ContextTypes.DEFAULT_TYPE)
     user_language = context.user_data["user_language"]
     keyboard = [
         [InlineKeyboardButton(messages.CALMNESS_STORY[user_language], callback_data=f"user_rate_calmness_story")],
-        [InlineKeyboardButton(messages.CALMNESS_QUESTIONS[user_language], callback_data=f"user_rate_calmness_questions")],
+        [
+            InlineKeyboardButton(
+                messages.CALMNESS_QUESTIONS[user_language], callback_data=f"user_rate_calmness_questions"
+            )
+        ],
         [InlineKeyboardButton(messages.EYE_STORY[user_language], callback_data=f"user_rate_eye_contact_story")],
         [InlineKeyboardButton(messages.EYE_QUESTIONS[user_language], callback_data=f"user_rate_eye_contact_questions")],
         [InlineKeyboardButton(messages.ANSWER_SKILL[user_language], callback_data=f"user_rate_answers_skill")],
@@ -147,7 +165,9 @@ async def user_show_criteria(update: Update, context: ContextTypes.DEFAULT_TYPE)
         [InlineKeyboardButton(messages.FINISH_RATING[user_language], callback_data=f"user_finish_exam")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await context.bot.send_message(update.effective_chat.id, messages.CHOOSE_FIELD_TO_RATE[user_language], reply_markup=reply_markup)
+    await context.bot.send_message(
+        update.effective_chat.id, messages.CHOOSE_FIELD_TO_RATE[user_language], reply_markup=reply_markup
+    )
     return USER_CHOOSE_RATE
 
 
@@ -179,10 +199,8 @@ async def user_rate_calmness_story_store(update: Update, context: ContextTypes.D
     if score == None:
         return await user_show_criteria(update, context)
     context.user_data["exam"].add_answer(
-        context.user_data["user_id"],
-        context.user_data["speaker_id"],
-        "calmness_story",
-        score)
+        context.user_data["user_id"], context.user_data["speaker_id"], "calmness_story", score
+    )
     await context.bot.send_message(update.effective_chat.id, messages.RATE_ENTERING_THANKS[user_language])
     return await user_show_criteria(update, context)
 
@@ -199,10 +217,8 @@ async def user_rate_calmness_questions_store(update: Update, context: ContextTyp
     if score == None:
         return await user_show_criteria(update, context)
     context.user_data["exam"].add_answer(
-        context.user_data["user_id"],
-        context.user_data["speaker_id"],
-        "calmness_questions",
-        score)
+        context.user_data["user_id"], context.user_data["speaker_id"], "calmness_questions", score
+    )
     await context.bot.send_message(update.effective_chat.id, messages.RATE_ENTERING_THANKS[user_language])
     return await user_show_criteria(update, context)
 
@@ -219,10 +235,8 @@ async def user_rate_eye_contact_story_store(update: Update, context: ContextType
     if score == None:
         return await user_show_criteria(update, context)
     context.user_data["exam"].add_answer(
-        context.user_data["user_id"],
-        context.user_data["speaker_id"],
-        "eye_contact_story",
-        score)
+        context.user_data["user_id"], context.user_data["speaker_id"], "eye_contact_story", score
+    )
     await context.bot.send_message(update.effective_chat.id, messages.RATE_ENTERING_THANKS[user_language])
     return await user_show_criteria(update, context)
 
@@ -239,10 +253,8 @@ async def user_rate_eye_contact_questions_store(update: Update, context: Context
     if score == None:
         return await user_show_criteria(update, context)
     context.user_data["exam"].add_answer(
-        context.user_data["user_id"],
-        context.user_data["speaker_id"],
-        "eye_contact_quesitons",
-        score)
+        context.user_data["user_id"], context.user_data["speaker_id"], "eye_contact_quesitons", score
+    )
     await context.bot.send_message(update.effective_chat.id, messages.RATE_ENTERING_THANKS[user_language])
     return await user_show_criteria(update, context)
 
@@ -259,10 +271,8 @@ async def user_rate_answers_skill_store(update: Update, context: ContextTypes.DE
     if score == None:
         return await user_show_criteria(update, context)
     context.user_data["exam"].add_answer(
-        context.user_data["user_id"],
-        context.user_data["speaker_id"],
-        "answer_skill",
-        score)
+        context.user_data["user_id"], context.user_data["speaker_id"], "answer_skill", score
+    )
     await context.bot.send_message(update.effective_chat.id, messages.RATE_ENTERING_THANKS[user_language])
     return await user_show_criteria(update, context)
 
@@ -276,10 +286,8 @@ async def user_rate_notes(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def user_rate_notes_store(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_language = context.user_data["user_language"]
     context.user_data["exam"].add_answer(
-        context.user_data["user_id"],
-        context.user_data["speaker_id"],
-        "notes",
-        update.message.text)
+        context.user_data["user_id"], context.user_data["speaker_id"], "notes", update.message.text
+    )
     await context.bot.send_message(update.effective_chat.id, messages.RATE_ENTERING_THANKS[user_language])
     return await user_show_criteria(update, context)
 

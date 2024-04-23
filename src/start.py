@@ -1,3 +1,5 @@
+import sys
+
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, CallbackQueryHandler, ConversationHandler
 
@@ -7,21 +9,25 @@ import messages
 CHOOSING_LANGUAGE = 0
 CHOOSING_ROLE = 1
 
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     Output the start menu with role choice - admin or user.
     """
     keyboard = [
         [
-            InlineKeyboardButton("EN", callback_data="interface_language_en"),
-            InlineKeyboardButton("RU", callback_data="interface_language_ru"),
+            InlineKeyboardButton("English", callback_data="interface_language_en"),
+            InlineKeyboardButton("Русский", callback_data="interface_language_ru"),
         ],
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await context.bot.send_message(update.effective_chat.id, "Choose interface language / Выберите язык интерфейса:", reply_markup=reply_markup)
+    await context.bot.send_message(
+        update.effective_chat.id, "Choose interface language / Выберите язык интерфейса:", reply_markup=reply_markup
+    )
     return CHOOSING_LANGUAGE
+
 
 async def choosing_language(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -38,7 +44,9 @@ async def choosing_language(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     context.user_data["user_language"] = user_language
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=messages.USER_LANGUAGE[user_language] % user_language)
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, text=messages.USER_LANGUAGE[user_language] % user_language
+    )
 
     keyboard = [
         [
@@ -49,5 +57,7 @@ async def choosing_language(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await context.bot.send_message(update.effective_chat.id, messages.CHOOSE_SCENARIO[user_language], reply_markup=reply_markup)
+    await context.bot.send_message(
+        update.effective_chat.id, messages.CHOOSE_SCENARIO[user_language], reply_markup=reply_markup
+    )
     return CHOOSING_ROLE

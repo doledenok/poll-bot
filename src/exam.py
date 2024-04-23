@@ -10,6 +10,7 @@ class ExamStatus(enum.Enum):
     PresentationsFinished = 2
     ResultsReviewFinished = 3
 
+
 class ExaminatedSkills(enum.Enum):
     CalmnessStory = 0
     CalmnessQuestions = 1
@@ -17,6 +18,7 @@ class ExaminatedSkills(enum.Enum):
     EyeContactQuesitons = 3
     AnswerSkill = 4
     Notes = 5
+
 
 class Exam:
     def __init__(self, id: int):
@@ -44,10 +46,10 @@ class Exam:
         without_one_speakers = self.speaker_names[:speaker_id]
         if speaker_id >= len(self.speaker_names) - 1:
             return without_one_speakers
-        return without_one_speakers + self.speaker_names[speaker_id+1:]
+        return without_one_speakers + self.speaker_names[speaker_id + 1 :]
 
     def get_name_by_id(self, speaker_id: int) -> str:
-        return self.speaker_names[speaker_id] # если вдруг слишком большой id - пусть падает
+        return self.speaker_names[speaker_id]  # если вдруг слишком большой id - пусть падает
 
     def add_answer(self, listener_id: int, speaker_id: int, field: str, value: int | str):
         """
@@ -75,12 +77,14 @@ class Exam:
             for listener_id in range(len(self.speaker_answers)):
                 for speaker_id in self.speaker_answers[listener_id]:
                     for field in self.speaker_answers[listener_id][speaker_id]:
-                        writer.writerow({
-                            'exam_id': self.exam_id,
-                            'answering_student_id': speaker_id,
-                            'listening_student_id': listener_id,
-                            'question_id': field,
-                            'student_mark': self.speaker_answers[listener_id][speaker_id][field]
-                        })
+                        writer.writerow(
+                            {
+                                'exam_id': self.exam_id,
+                                'answering_student_id': speaker_id,
+                                'listening_student_id': listener_id,
+                                'question_id': field,
+                                'student_mark': self.speaker_answers[listener_id][speaker_id][field],
+                            }
+                        )
                         saved_rows += 1
         return saved_rows

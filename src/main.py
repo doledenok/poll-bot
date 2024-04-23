@@ -16,14 +16,14 @@ def main():
     application = ApplicationBuilder().token(token).build()
 
     states = {
-            CHOOSING_LANGUAGE: [
-                CallbackQueryHandler(choosing_language, pattern="^interface_language"),
-            ],
-            CHOOSING_ROLE: [
-                CallbackQueryHandler(admin_main, pattern="^admin_start"),
-                CallbackQueryHandler(user_main, pattern="^user_start"),
-            ]
-        }
+        CHOOSING_LANGUAGE: [
+            CallbackQueryHandler(choosing_language, pattern="^interface_language"),
+        ],
+        CHOOSING_ROLE: [
+            CallbackQueryHandler(admin_main, pattern="^admin_start"),
+            CallbackQueryHandler(user_main, pattern="^user_start"),
+        ],
+    }
     states |= admin_states | user_states
 
     conv_handler = ConversationHandler(
