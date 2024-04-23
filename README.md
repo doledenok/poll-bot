@@ -24,15 +24,15 @@
 
 Стартовый выбор сценария:
 
-![](docs/source/_static/start.jpg)
+![](https://raw.githubusercontent.com/doledenok/poll-bot/main/docs/source/_static/start.jpg)
 -----
 
 Организатор. Проведение экзамена
 
-![](docs/source/_static/exam_managing.jpg){width="50%"}
+![](https://raw.githubusercontent.com/doledenok/poll-bot/main/docs/source/_static/exam_managing.jpg){width="50%"}
 ----
 
 Организатор. Просмотр результатов экзамена
 
-![](docs/source/_static/review_exam_results.jpg){width="50%"}
+![](https://raw.githubusercontent.com/doledenok/poll-bot/main/docs/source/_static/review_exam_results.jpg){width="50%"}
 
